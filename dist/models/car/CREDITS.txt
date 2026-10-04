@@ -1,0 +1,17 @@
+Vehicle assets
+==============
+
+hatchback-sports.glb is from Kenney's "Car Kit".
+
+  https://kenney.nl/assets/car-kit
+  License: CC0 1.0 (see LICENSE-kenney.txt)
+
+The model ships the body and all four wheels as separate nodes
+(wheel-front-left, wheel-front-right, wheel-back-left, wheel-back-right), which
+the runtime drives independently from the CANNON.RaycastVehicle wheel
+transforms — giving steering yaw on the front pair and rolling spin on all four.
+
+Textures/colormap.png is the kit's shared colour atlas, referenced by the GLB.
+
+Scale (see CAR in src/models.js): the source model is 2.85 m long and is scaled
+uniformly by 1.4035 to a 4.0 m car, giving 1.82 m width and 1.54 m height.

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js + Cannon-es City Drive</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0d12; }
+      #app { position: fixed; inset: 0; }
+      canvas { display: block; }
+
+      #hud {
+        position: fixed;
+        left: 16px;
+        bottom: 16px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: rgba(15, 18, 26, 0.72);
+        color: #e8ecf4;
+        font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        user-select: none;
+        pointer-events: none;
+      }
+      #hud b { color: #ffd166; font-weight: 600; }
+
+      #speed {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        padding: 10px 16px;
+        border-radius: 10px;
+        background: rgba(15, 18, 26, 0.72);
+        color: #9be7ff;
+        font: 700 22px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        user-select: none;
+        pointer-events: none;
+      }
+      #speed span { font-size: 12px; font-weight: 400; color: #e8ecf4; }
+
+      /* Floating world-anchored prompt: JS sets the transform each frame. */
+      #prompt {
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding: 8px 15px;
+        border-radius: 999px;
+        background: rgba(15, 18, 26, 0.85);
+        border: 1px solid rgba(255, 209, 102, 0.45);
+        color: #ffd166;
+        font: 600 13px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        white-space: nowrap;
+        pointer-events: none;
+        user-select: none;
+        opacity: 0;
+        transition: opacity 120ms ease;
+        backdrop-filter: blur(6px);
+        will-change: transform, opacity;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      }
+      #prompt.visible { opacity: 1; }
+      #prompt.warn {
+        color: #ff9a76;
+        border-color: rgba(255, 154, 118, 0.55);
+      }
+
+      #lock-hint {
+        position: fixed;
+        left: 50%;
+        top: 18px;
+        transform: translateX(-50%);
+        padding: 6px 13px;
+        border-radius: 999px;
+        background: rgba(15, 18, 26, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #e8ecf4;
+        font: 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        pointer-events: none;
+        user-select: none;
+        opacity: 0;
+        transition: opacity 220ms ease;
+      }
+      #lock-hint.visible { opacity: 1; }
+
+      /* NPC alert banner (pedestrian struck, etc.). */
+      #alert {
+        position: fixed;
+        left: 50%;
+        top: 64px;
+        transform: translateX(-50%);
+        padding: 9px 20px;
+        border-radius: 999px;
+        background: rgba(120, 12, 12, 0.85);
+        border: 1px solid rgba(255, 120, 120, 0.6);
+        color: #ffe3e3;
+        font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        letter-spacing: 0.04em;
+        pointer-events: none;
+        user-select: none;
+        opacity: 0;
+        transition: opacity 200ms ease;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+        z-index: 6;
+      }
+      #alert.visible { opacity: 1; }
+
+      #loading {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: #0b0d12;
+        color: #e8ecf4;
+        font: 13px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        z-index: 10;
+        transition: opacity 400ms ease;
+      }
+      #loading.hidden { opacity: 0; pointer-events: none; }
+      #loading .spinner {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 209, 102, 0.25);
+        border-top-color: #ffd166;
+        animation: spin 800ms linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* ---------------------------------------------------------- minimap */
+      /* The radar image itself is drawn into the WebGL canvas by minimap.js;
+         this element only supplies the glass ring, ticks and the N marker. */
+      #minimap {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        pointer-events: none;
+        user-select: none;
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.16);
+        box-shadow:
+          0 0 0 2px rgba(17, 17, 17, 0.75),
+          0 8px 30px rgba(0, 0, 0, 0.55),
+          inset 0 0 26px rgba(0, 0, 0, 0.5),
+          0 0 24px rgba(96, 176, 255, 0.18);
+        backdrop-filter: blur(1px);
+        z-index: 5;
+      }
+      #minimap::after {
+        content: '';
+        position: absolute;
+        inset: 7px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      #minimap .tick {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 1px;
+        height: 6px;
+        margin-left: -0.5px;
+        background: rgba(255, 255, 255, 0.22);
+        transform-origin: 50% 0;
+      }
+      #minimap-n {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        color: #ffd166;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.8);
+        will-change: transform;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="loading"><div class="spinner"></div><div class="label">Loading city&hellip;</div></div>
+    <div id="prompt"></div>
+    <div id="lock-hint">click to capture the mouse</div>
+    <div id="hud"></div>
+    <div id="speed">0 <span>km/h</span></div>
+    <div id="alert"></div>
+    <div id="minimap">
+      <div id="minimap-n">N</div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

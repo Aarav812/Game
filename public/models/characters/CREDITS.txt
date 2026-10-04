@@ -1,0 +1,36 @@
+Player character credits
+=======================
+
+character.glb is Quaternius' "Casual Hoodie" character (CC0 1.0).
+
+  A casual human: purple hoodie, dark trousers, white sneakers, hair, eyes and
+  eyebrows — all modelled geometry with their own materials. Organised into
+  Casual_Body / Casual_Head / Casual_Legs / Casual_Feet groups.
+
+  It ships its OWN 24 animation clips on its own 62-bone skeleton, so the game
+  plays them natively with AnimationMixer:
+
+    Idle   1.67s   -> idle
+    Walk   1.33s   -> walk
+    Run    0.80s   -> run
+
+  There is no jump clip. Rather than compose a pose, the game simply keeps the
+  Walk/Run cycle playing while the character is airborne and moves the physics
+  capsule up and down. No bone, pose or material is ever rewritten by hand, so
+  the rig cannot contort and no limb can disappear.
+
+  No weapon or held-item meshes exist in the file. src/player.js still runs
+  _stripHeldItems() on load as a guard: it removes any mesh whose name or
+  material matches a weapon pattern, and anything parented beneath a hand/wrist
+  bone that is not a body part.
+
+There is NO retargeting anywhere in this project. Earlier revisions retargeted
+clips between different rigs, which produced contorted poses and has been
+removed entirely — every clip the game plays is authored on this skeleton.
+
+Rebuild / verify:
+  npm run character:check      # clips, rig binding, proportions, limb sanity
+  npm run character:measure    # raw per-vertex skinned ground truth
+
+The character faces +Z and stands base-at-y=0, matching src/models.js.
+Scale: raw 1.828 m, uniformly scaled by 0.985 to 1.800 m, soles on the capsule base.

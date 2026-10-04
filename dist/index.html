@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js + Cannon-es City Drive</title>
+    <style>*{box-sizing:border-box;margin:0;padding:0}html,body{background:#0b0d12;width:100%;height:100%;overflow:hidden}#app{position:fixed;inset:0}canvas{display:block}#hud{color:#e8ecf4;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);-webkit-user-select:none;user-select:none;pointer-events:none;background:#0f121ab8;border:1px solid #ffffff14;border-radius:10px;padding:12px 16px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;position:fixed;bottom:16px;left:16px}#hud b{color:#ffd166;font-weight:600}#speed{color:#9be7ff;-webkit-user-select:none;user-select:none;pointer-events:none;background:#0f121ab8;border:1px solid #ffffff14;border-radius:10px;padding:10px 16px;font:700 22px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;position:fixed;bottom:16px;right:16px}#speed span{color:#e8ecf4;font-size:12px;font-weight:400}#prompt{color:#ffd166;white-space:nowrap;pointer-events:none;-webkit-user-select:none;user-select:none;opacity:0;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);will-change:transform, opacity;background:#0f121ad9;border:1px solid #ffd16673;border-radius:999px;padding:8px 15px;font:600 13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;transition:opacity .12s;position:fixed;top:0;left:0;box-shadow:0 6px 20px #00000059}#prompt.visible{opacity:1}#prompt.warn{color:#ff9a76;border-color:#ff9a768c}#lock-hint{color:#e8ecf4;pointer-events:none;-webkit-user-select:none;user-select:none;opacity:0;background:#0f121a99;border:1px solid #ffffff14;border-radius:999px;padding:6px 13px;font:12px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;transition:opacity .22s;position:fixed;top:18px;left:50%;transform:translate(-50%)}#lock-hint.visible{opacity:1}#alert{color:#ffe3e3;letter-spacing:.04em;pointer-events:none;-webkit-user-select:none;user-select:none;opacity:0;z-index:6;background:#780c0cd9;border:1px solid #ff787899;border-radius:999px;padding:9px 20px;font:700 14px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;transition:opacity .2s;position:fixed;top:64px;left:50%;transform:translate(-50%);box-shadow:0 6px 24px #00000073}#alert.visible{opacity:1}#loading{color:#e8ecf4;z-index:10;background:#0b0d12;flex-direction:column;justify-content:center;align-items:center;gap:14px;font:13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;transition:opacity .4s;display:flex;position:fixed;inset:0}#loading.hidden{opacity:0;pointer-events:none}#loading .spinner{border:3px solid #ffd16640;border-top-color:#ffd166;border-radius:50%;width:34px;height:34px;animation:.8s linear infinite spin}@keyframes spin{to{transform:rotate(360deg)}}#minimap{pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px);z-index:5;background:0 0;border:2px solid #ffffff29;border-radius:50%;width:190px;height:190px;position:fixed;top:20px;right:20px;box-shadow:0 0 0 2px #111111bf,0 8px 30px #0000008c,inset 0 0 26px #00000080,0 0 24px #60b0ff2e}#minimap:after{content:"";border:1px solid #ffffff12;border-radius:50%;position:absolute;inset:7px}#minimap .tick{transform-origin:50% 0;background:#ffffff38;width:1px;height:6px;margin-left:-.5px;position:absolute;top:50%;left:50%}#minimap-n{color:#ffd166;text-shadow:0 0 5px #000000f2,0 0 10px #000c;will-change:transform;font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;position:absolute;top:50%;left:50%}</style>
+    <script type="module" crossorigin src="/assets/index-CifL5zd_.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="loading"><div class="spinner"></div><div class="label">Loading city&hellip;</div></div>
+    <div id="prompt"></div>
+    <div id="lock-hint">click to capture the mouse</div>
+    <div id="hud"></div>
+    <div id="speed">0 <span>km/h</span></div>
+    <div id="alert"></div>
+    <div id="minimap">
+      <div id="minimap-n">N</div>
+    </div>
+  </body>
+</html>
